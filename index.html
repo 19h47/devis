@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff">
+<title>Devis 19h47</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500&display=swap">
+<style>
+/* Une feuille A4 éditable en place. La barre d'outils et les boutons disparaissent à l'impression. */
+/* Interface : même système que typewriter, sms, messenger, tumblr et tweets (échelle φ, gris chauds) */
+:root {
+	color-scheme: light dark;
+	--devis-phi: 1.618034;
+	--devis-u0: calc(var(--devis-u1) / var(--devis-phi));
+	--devis-u1: 1rem;
+	--devis-u2: calc(var(--devis-phi) * var(--devis-u1));
+	--devis-u3: calc(var(--devis-phi) * var(--devis-u2));
+
+	--devis-bg: light-dark(rgb(255, 255, 255), rgb(26, 26, 26));
+	--devis-text: light-dark(rgb(69, 69, 69), rgb(186, 186, 186));
+	--devis-text-muted: light-dark(rgb(92, 92, 92), rgb(154, 151, 144));
+	--devis-line: light-dark(rgb(201, 196, 184), rgb(58, 56, 52));
+	--devis-line-soft: color-mix(in srgb, var(--devis-line) 50%, transparent);
+
+	--devis-font-mono: "SF Mono", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
+	--devis-font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--devis-font-small: var(--devis-u0);
+
+	--devis-radius: var(--devis-u0);
+	--devis-control-size: var(--devis-u3);
+	--devis-control-gap: calc(var(--devis-u0) / var(--devis-phi));
+	--devis-control-opacity: calc(1 / var(--devis-phi));
+	--devis-focus-outline: 2px solid var(--devis-text);
+	--devis-focus-outline-offset: 2px;
+	--devis-transition-1: 0.15s;
+
+	/* La feuille reste du papier blanc, quel que soit le thème */
+	--devis-paper: rgb(255, 255, 255);
+	--devis-ink: rgb(26, 26, 26);
+	--devis-paper-muted: rgb(92, 92, 92);
+	--devis-paper-line: rgb(201, 196, 184);
+	--devis-paper-fill: color-mix(in srgb, var(--devis-paper-line) 20%, transparent);
+	--devis-font-sheet: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background: var(--devis-bg); scrollbar-width: none; }
+body {
+	color: var(--devis-text);
+	font-family: var(--devis-font-mono);
+	font-size: var(--devis-u1);
+	line-height: var(--devis-phi);
+	-webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: var(--devis-focus-outline); outline-offset: var(--devis-focus-outline-offset); }
+
+.devis-page { padding: calc(var(--devis-u3) + var(--devis-u2)) var(--devis-u2) var(--devis-u3); overflow-x: auto; }
+
+.devis-toolbar { position: fixed; top: var(--devis-u2); right: var(--devis-u2); z-index: 1; display: flex; gap: var(--devis-control-gap); }
+.devis-toolbar button {
+	width: var(--devis-control-size); height: var(--devis-control-size);
+	border: 1px solid var(--devis-line); border-radius: var(--devis-radius);
+	background: var(--devis-bg); color: var(--devis-text); cursor: pointer;
+	font-family: var(--devis-font-ui); font-size: var(--devis-u1);
+	display: flex; align-items: center; justify-content: center;
+	opacity: var(--devis-control-opacity); transition: opacity var(--devis-transition-1);
+}
+.devis-toolbar button:hover, .devis-toolbar button:focus-visible { opacity: 1; }
+
+.devis-pill {
+	position: fixed; top: var(--devis-u2); left: var(--devis-u2); z-index: 1;
+	display: inline-flex; align-items: center; gap: var(--devis-u0);
+	height: var(--devis-control-size); padding: 0 calc(var(--devis-u1) / 1.1);
+	border-radius: 999px; border: 1px solid var(--devis-line-soft); background: var(--devis-bg);
+	color: var(--devis-text-muted); font-family: var(--devis-font-ui); font-size: var(--devis-font-small);
+	text-transform: uppercase; white-space: nowrap; cursor: pointer;
+}
+.devis-pill:hover { color: var(--devis-text); }
+.devis-pill:has(:focus-visible) { outline: var(--devis-focus-outline); outline-offset: var(--devis-focus-outline-offset); }
+.devis-pill input { border: none; background: transparent; color: var(--devis-text); font: inherit; outline: none; cursor: pointer; }
+
+/* Cotes reprises du gabarit InDesign : Work Sans 12 pt, grille de 14 pt, marges latérales 52,64 pt */
+.sheet {
+	width: 210mm; min-height: 297mm; margin: 0 auto; padding: 98pt 52.64pt 52pt;
+	background: var(--devis-paper); color: var(--devis-ink); color-scheme: light;
+	font-family: var(--devis-font-sheet); font-size: 12pt; line-height: 14pt;
+	border: 1px solid var(--devis-line-soft);
+}
+
+[contenteditable] { outline: none; border-radius: 2px; white-space: pre-line; }
+[contenteditable]:hover, [contenteditable]:focus { background: var(--devis-paper-fill); }
+[contenteditable]:focus { box-shadow: 0 0 0 1px var(--devis-paper-line); }
+[contenteditable]:empty::before { content: attr(data-ph); color: var(--devis-paper-muted); }
+
+.brand, footer .site { font-size: 18pt; font-weight: 500; letter-spacing: .1em; }
+.brand { margin-bottom: 28pt; }
+.parties { display: grid; grid-template-columns: 210pt 1fr; margin-left: 84pt; }
+.parties > div::first-line { font-weight: 500; }
+h1 { max-width: 406pt; font-weight: 500; font-size: 30pt; line-height: 28pt; margin: 28pt 0 28pt 42pt; }
+
+table { width: 100%; table-layout: fixed; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+col.c-desc { width: 238pt; }
+th { font-weight: 500; letter-spacing: .1em; text-transform: uppercase; text-align: right; padding: 0 0 14pt; }
+th:first-child, td:first-child { text-align: left; }
+td { vertical-align: top; text-align: right; padding: 0 0 14pt; position: relative; }
+td .detail { display: block; font-size: 10pt; }
+td .hours { display: block; font-family: var(--devis-font-ui); font-size: 7pt; text-transform: uppercase; color: var(--devis-paper-muted); }
+tr { break-inside: avoid; }
+tbody tr .remove {
+	position: absolute; left: -12mm; top: 0; padding: 0 6px; border: 0; background: none; cursor: pointer;
+	color: var(--devis-paper-muted); font-family: var(--devis-font-ui); font-size: 14px; line-height: 14pt;
+	opacity: 0; transition: opacity var(--devis-transition-1);
+}
+tbody tr:hover .remove, .remove:focus-visible { opacity: 1; }
+.remove:hover { color: var(--devis-ink); }
+/* Posé dans le blanc à gauche de « Total HT », hors du flux pour ne pas décaler la grille */
+.add {
+	position: absolute; left: 0; top: 14pt; height: 14pt; padding: 0 calc(var(--devis-u1) / 1.1);
+	border-radius: 999px; border: 1px solid var(--devis-paper-line); background: none; cursor: pointer;
+	color: var(--devis-paper-muted); font-family: var(--devis-font-ui); font-size: var(--devis-font-small);
+	font-weight: 400; letter-spacing: 0; text-transform: uppercase; line-height: 1;
+}
+.add:hover { color: var(--devis-ink); }
+tfoot tr:first-child td { padding-top: 14pt; }
+tfoot td:first-child { text-align: right; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+tfoot sup { font-size: 7pt; line-height: 0; }
+
+.place { font-size: 10pt; margin: 0 0 14pt; }
+footer { display: flex; justify-content: space-between; align-items: baseline; gap: 14pt; }
+footer .ref { font-weight: 500; }
+
+/* Grille de contrôle : 12 colonnes de 28 pt, gouttières de 14 pt, lignes de base tous les 14 pt. G pour l'afficher. */
+.sheet { position: relative; }
+devis-grid {
+	position: absolute; inset: 0; z-index: 1; pointer-events: none;
+	background: repeating-linear-gradient(to bottom, transparent 0 calc(14pt - 1px), color-mix(in srgb, var(--devis-paper-line) 70%, transparent) calc(14pt - 1px) 14pt);
+}
+devis-grid > div { position: absolute; inset: 0 52.64pt; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 14pt; }
+devis-grid span { position: relative; background: color-mix(in srgb, var(--devis-paper-line) 15%, transparent); }
+devis-grid span:nth-child(even) { background: color-mix(in srgb, var(--devis-paper-line) 6%, transparent); }
+devis-grid span::after {
+	content: attr(data-index); position: absolute; inset-inline: 0; bottom: 4pt; text-align: center;
+	font-family: var(--devis-font-ui); font-size: 7pt; color: var(--devis-paper-muted);
+}
+
+@page { size: A4; margin: 0; }
+@media print {
+	html { background: #fff; }
+	.devis-page { padding: 0; overflow: visible; }
+	.devis-toolbar, .devis-pill, .add, .remove, .hours, devis-grid { display: none !important; }
+	.sheet { border: 0; margin: 0; }
+	[contenteditable]:empty::before { content: none; }
+}
+</style>
+</head>
+<body>
+<label class="devis-pill">Date <input type="date" id="date"></label>
+<div class="devis-toolbar">
+	<button type="button" id="new" aria-label="Nouveau devis" title="Nouveau devis">+</button>
+	<button type="button" id="import" aria-label="Importer un devis (.json)" title="Importer un devis (.json)">⤒&#xFE0E;</button>
+	<button type="button" id="export" aria-label="Exporter le devis (.json)" title="Exporter le devis (.json)">⤓&#xFE0E;</button>
+	<button type="button" id="grid" aria-label="Afficher la grille (G)" title="Afficher la grille (G)" aria-pressed="false">#</button>
+	<button type="button" id="print" aria-label="Enregistrer en PDF (⌘P)" title="Enregistrer en PDF (⌘P)">⎙&#xFE0E;</button>
+	<button type="button" id="theme" aria-label="Changer de thème" title="Changer de thème"></button>
+	<input type="file" id="importFile" accept=".json,application/json" hidden>
+</div>
+
+<main class="devis-page">
+<article class="sheet" id="sheet">
+	<devis-grid aria-hidden="true" hidden><div></div></devis-grid>
+	<div class="brand">19h47</div>
+	<div class="parties">
+		<div contenteditable="plaintext-only" data-key="issuer" data-ph="Émetteur"></div>
+		<div contenteditable="plaintext-only" data-key="client" data-ph="Client"></div>
+	</div>
+	<h1 contenteditable="plaintext-only" data-key="title" data-ph="Titre du devis"></h1>
+	<table>
+		<colgroup><col class="c-desc"><col><col><col></colgroup>
+		<thead><tr><th>Description</th><th>Quantité</th><th>Prix</th><th>Total</th></tr></thead>
+		<tbody id="lines"></tbody>
+		<tfoot>
+			<tr><td><button type="button" class="add" id="add">+ Ligne</button>Total HT</td><td id="qtyTotal"></td><td></td><td id="ht"></td></tr>
+			<tr><td>TVA <sup><span contenteditable="plaintext-only" data-key="vat"></span>%</sup></td><td></td><td></td><td id="vatTotal"></td></tr>
+			<tr><td>Total TTC</td><td></td><td></td><td id="ttc"></td></tr>
+		</tfoot>
+	</table>
+	<p class="place"><span contenteditable="plaintext-only" data-key="place" data-ph="Lieu"></span>, le <span class="long-date"></span></p>
+	<footer><span class="site">19h47.fr</span><span class="ref">Devis - <span id="issuerName"></span> - <span class="long-date"></span></span></footer>
+</article>
+</main>
+
+<script>
+const STORAGE_KEY = 'devis-19h47';
+const RATE = '500';
+const today = () => new Date().toISOString().slice(0, 10);
+const emptyLine = () => ({ label: '', detail: '', qty: '0,125', price: RATE });
+
+const DEFAULT = {
+	issuer: '',
+	client: '',
+	title: '',
+	place: '',
+	date: today(),
+	vat: '20',
+	lines: [emptyLine()],
+};
+
+const $ = id => document.getElementById(id);
+const parse = v => parseFloat(String(v ?? '').replace(/\s/g, '').replace(',', '.')) || 0;
+const round2 = n => Math.round(n * 100) / 100;
+const fmtNum = n => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 4 }).format(n);
+const fmtEur = n => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(round2(n)) + ' €';
+const fmtDate = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// 1 jour = 8 h, affiché à l'écran seulement
+function fmtHours(qty) {
+	const minutes = Math.round(qty * 8 * 60);
+	if (minutes <= 0) return '';
+	const h = Math.floor(minutes / 60), m = minutes % 60;
+	return h ? (m ? `${h} h ${String(m).padStart(2, '0')}` : `${h} h`) : `${m} min`;
+}
+
+let state = load();
+
+function load() {
+	try {
+		const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+		if (saved && Array.isArray(saved.lines)) return { ...DEFAULT, ...saved };
+	} catch (e) {}
+	return structuredClone(DEFAULT);
+}
+
+function save() {
+	try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function renderLines() {
+	$('lines').innerHTML = state.lines.map((line, i) => `
+		<tr data-index="${i}">
+			<td>
+				<button type="button" class="remove" aria-label="Supprimer la ligne">×</button>
+				<span contenteditable="plaintext-only" data-field="label" data-ph="Intitulé">${escapeHtml(line.label)}</span>
+				<span class="detail" contenteditable="plaintext-only" data-field="detail" data-ph="Détail (facultatif)">${escapeHtml(line.detail)}</span>
+			</td>
+			<td><span contenteditable="plaintext-only" data-field="qty">${escapeHtml(line.qty)}</span><span class="hours"></span></td>
+			<td><span contenteditable="plaintext-only" data-field="price">${escapeHtml(line.price)}</span> €</td>
+			<td class="total"></td>
+		</tr>`).join('');
+}
+
+// Ne touche qu'aux valeurs calculées, pour ne pas perdre le curseur pendant la saisie
+function renderTotals() {
+	let qtyTotal = 0, ht = 0;
+	[...$('lines').rows].forEach((row, i) => {
+		const qty = parse(state.lines[i].qty);
+		const total = round2(qty * parse(state.lines[i].price));
+		qtyTotal += qty;
+		ht += total;
+		row.querySelector('.total').textContent = fmtEur(total);
+		row.querySelector('.hours').textContent = fmtHours(qty);
+	});
+	const vat = round2(ht * parse(state.vat) / 100);
+	$('qtyTotal').textContent = fmtNum(qtyTotal);
+	$('ht').textContent = fmtEur(ht);
+	$('vatTotal').textContent = fmtEur(vat);
+	$('ttc').textContent = fmtEur(ht + vat);
+	document.querySelectorAll('.long-date').forEach(el => { el.textContent = fmtDate(state.date); });
+	$('issuerName').textContent = (state.issuer || '').split('\n')[0];
+}
+
+function render() {
+	document.querySelectorAll('[data-key]').forEach(el => { el.textContent = state[el.dataset.key] ?? ''; });
+	$('date').value = state.date;
+	renderLines();
+	renderTotals();
+}
+
+function update() {
+	save();
+	renderTotals();
+}
+
+$('sheet').addEventListener('input', e => {
+	const el = e.target;
+	if (el.dataset.key) {
+		state[el.dataset.key] = el.innerText.replace(/\n$/, '');
+	} else if (el.dataset.field) {
+		state.lines[el.closest('tr').dataset.index][el.dataset.field] = el.innerText.replace(/\n$/, '');
+	}
+	update();
+});
+
+$('lines').addEventListener('click', e => {
+	if (!e.target.classList.contains('remove')) return;
+	state.lines.splice(Number(e.target.closest('tr').dataset.index), 1);
+	save();
+	render();
+});
+
+$('add').addEventListener('click', () => {
+	state.lines.push(emptyLine());
+	save();
+	render();
+	$('lines').lastElementChild.querySelector('[data-field="label"]').focus();
+});
+
+$('date').addEventListener('input', e => {
+	state.date = e.target.value;
+	update();
+});
+
+$('new').addEventListener('click', () => {
+	if (!confirm('Vider le devis en cours ? Exporte-le avant si tu veux le garder.')) return;
+	state = { ...state, client: '', title: 'Devis évolution Shopify', date: today(), lines: [emptyLine()] };
+	save();
+	render();
+});
+
+$('export').addEventListener('click', () => {
+	const a = document.createElement('a');
+	a.href = URL.createObjectURL(new Blob([JSON.stringify(state, null, '\t')], { type: 'application/json' }));
+	a.download = `${state.date || today()}.json`;
+	a.click();
+	URL.revokeObjectURL(a.href);
+});
+
+$('import').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', async e => {
+	const file = e.target.files[0];
+	if (!file) return;
+	try {
+		const data = JSON.parse(await file.text());
+		if (!Array.isArray(data.lines)) throw new Error();
+		state = { ...DEFAULT, ...data };
+		save();
+		render();
+	} catch (err) {
+		alert('Ce fichier n’est pas un devis exporté depuis cet outil.');
+	}
+	e.target.value = '';
+});
+
+// Le PDF proposé prend la date pour nom, comme 2026-09-09.pdf
+const appTitle = document.title;
+window.addEventListener('beforeprint', () => { document.title = state.date || today(); });
+window.addEventListener('afterprint', () => { document.title = appTitle; });
+$('print').addEventListener('click', () => window.print());
+
+// Thème : suit le système tant qu'aucun choix n'a été fait, comme sur sms ou typewriter
+const THEME_KEY = 'devis-19h47-theme';
+const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+let chosenTheme = null;
+try { chosenTheme = ['light', 'dark'].includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : null; } catch (e) {}
+
+function applyTheme() {
+	const theme = chosenTheme ?? (darkQuery.matches ? 'dark' : 'light');
+	document.documentElement.dataset.theme = theme;
+	document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).backgroundColor;
+	$('theme').textContent = theme === 'dark' ? '☀︎' : '☽︎';
+	$('theme').setAttribute('aria-pressed', String(theme === 'dark'));
+}
+
+$('theme').addEventListener('click', () => {
+	chosenTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+	try { localStorage.setItem(THEME_KEY, chosenTheme); } catch (e) {}
+	applyTheme();
+});
+darkQuery.addEventListener('change', applyTheme);
+
+// Grille de contrôle, comme cinq-grid sur Eigrene : G pour basculer, état gardé le temps de la session
+class DevisGrid extends HTMLElement {
+	static STORAGE_KEY = 'devis-grid';
+
+	connectedCallback() {
+		this.firstElementChild.innerHTML = Array.from({ length: 12 }, (_, i) => `<span data-index="${i + 1}"></span>`).join('');
+		let stored = null;
+		try { stored = sessionStorage.getItem(DevisGrid.STORAGE_KEY); } catch (e) {}
+		this.toggle(stored === 'on');
+		document.addEventListener('keydown', this.onKeydown);
+		$('grid').addEventListener('click', () => this.toggle());
+	}
+
+	disconnectedCallback() {
+		document.removeEventListener('keydown', this.onKeydown);
+	}
+
+	toggle(force = this.hidden) {
+		this.hidden = !force;
+		$('grid').setAttribute('aria-pressed', String(force));
+		try { sessionStorage.setItem(DevisGrid.STORAGE_KEY, force ? 'on' : 'off'); } catch (e) {}
+	}
+
+	onKeydown = event => {
+		const { key, metaKey, ctrlKey, altKey, target } = event;
+		if (key !== 'g' && key !== 'G') return;
+		if (metaKey || ctrlKey || altKey) return;
+		if (target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable]')) return;
+		event.preventDefault();
+		this.toggle();
+	};
+}
+
+customElements.define('devis-grid', DevisGrid);
+
+applyTheme();
+render();
+</script>
+</body>
+</html>
