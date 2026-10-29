@@ -73,8 +73,8 @@ body {
 }
 .devis-toolbar button:hover, .devis-toolbar button:focus-visible { opacity: 1; }
 
+.devis-pills { position: fixed; top: var(--devis-u2); left: var(--devis-u2); z-index: 1; display: flex; gap: var(--devis-control-gap); }
 .devis-pill {
-	position: fixed; top: var(--devis-u2); left: var(--devis-u2); z-index: 1;
 	display: inline-flex; align-items: center; gap: var(--devis-u0);
 	height: var(--devis-control-size); padding: 0 calc(var(--devis-u1) / 1.1);
 	border-radius: 999px; border: 1px solid var(--devis-line-soft); background: var(--devis-bg);
@@ -83,11 +83,13 @@ body {
 }
 .devis-pill:hover { color: var(--devis-text); }
 .devis-pill:has(:focus-visible) { outline: var(--devis-focus-outline); outline-offset: var(--devis-focus-outline-offset); }
-.devis-pill input { border: none; background: transparent; color: var(--devis-text); font: inherit; outline: none; cursor: pointer; }
+.devis-pill input, .devis-pill select { border: none; background: transparent; color: var(--devis-text); font: inherit; text-transform: inherit; outline: none; cursor: pointer; }
 
-/* Cotes reprises du gabarit InDesign : Work Sans 12 pt, grille de 14 pt, marges latérales 52,64 pt */
+/* Cotes reprises du gabarit InDesign : Work Sans 12 pt, grille de 14 pt, marges de 98 pt en haut et en bas, 52,64 pt sur les côtés.
+   En colonne flexible, le pied de page se cale en bas de la feuille. */
 .sheet {
-	width: 210mm; min-height: 297mm; margin: 0 auto; padding: 98pt 52.64pt 52pt;
+	display: flex; flex-direction: column;
+	width: 210mm; min-height: 297mm; margin: 0 auto; padding: 98pt 52.64pt;
 	background: var(--devis-paper); color: var(--devis-ink); color-scheme: light;
 	font-family: var(--devis-font-sheet); font-size: 12pt; line-height: 14pt;
 	border: 1px solid var(--devis-line-soft);
@@ -131,8 +133,11 @@ tfoot tr:first-child td { padding-top: 14pt; }
 tfoot td:first-child { text-align: right; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
 tfoot sup { font-size: 7pt; line-height: 0; }
 
-.place { font-size: 10pt; margin: 0 0 14pt; }
-footer { display: flex; justify-content: space-between; align-items: baseline; gap: 14pt; }
+/* Aligné à droite sur la colonne Description, comme les libellés des totaux */
+.place { width: 238pt; text-align: right; font-size: 10pt; margin: 0 0 14pt; }
+/* Numéro et « Fait à » n'existent que sur une facture */
+.sheet:not([data-kind="facture"]) .facture-only { display: none; }
+footer { display: flex; justify-content: space-between; align-items: baseline; gap: 14pt; margin-top: auto; }
 footer .ref { font-weight: 500; }
 
 /* Grille de contrôle : 12 colonnes de 28 pt, gouttières de 14 pt, lignes de base tous les 14 pt. G pour l'afficher. */
@@ -160,7 +165,10 @@ devis-grid span::after {
 </style>
 </head>
 <body>
-<label class="devis-pill">Date <input type="date" id="date"></label>
+<div class="devis-pills">
+	<label class="devis-pill">Document <select id="kind"><option value="devis">Devis</option><option value="facture">Facture</option></select></label>
+	<label class="devis-pill">Date <input type="date" id="date"></label>
+</div>
 <div class="devis-toolbar">
 	<button type="button" id="new" aria-label="Nouveau devis" title="Nouveau devis">+</button>
 	<button type="button" id="import" aria-label="Importer un devis (.json)" title="Importer un devis (.json)">⤒&#xFE0E;</button>
@@ -176,10 +184,14 @@ devis-grid span::after {
 	<devis-grid aria-hidden="true" hidden><div></div></devis-grid>
 	<div class="brand">19h47</div>
 	<div class="parties">
-		<div contenteditable="plaintext-only" data-key="issuer" data-ph="Émetteur"></div>
+		<div>
+			<div contenteditable="plaintext-only" data-key="issuer" data-ph="Émetteur"></div>
+			<p class="facture-only">Numéro de facture <span contenteditable="plaintext-only" data-key="number" data-ph="2026001"></span></p>
+			<div contenteditable="plaintext-only" data-key="vatNumber" data-ph="N° de TVA intracommunautaire"></div>
+		</div>
 		<div contenteditable="plaintext-only" data-key="client" data-ph="Client"></div>
 	</div>
-	<h1 contenteditable="plaintext-only" data-key="title" data-ph="Titre du devis"></h1>
+	<h1 contenteditable="plaintext-only" data-key="title" data-ph="Titre"></h1>
 	<table>
 		<colgroup><col class="c-desc"><col><col><col></colgroup>
 		<thead><tr><th>Description</th><th>Quantité</th><th>Prix</th><th>Total</th></tr></thead>
@@ -190,8 +202,8 @@ devis-grid span::after {
 			<tr><td>Total TTC</td><td></td><td></td><td id="ttc"></td></tr>
 		</tfoot>
 	</table>
-	<p class="place"><span contenteditable="plaintext-only" data-key="place" data-ph="Lieu"></span>, le <span class="long-date"></span></p>
-	<footer><span class="site">19h47.fr</span><span class="ref">Devis - <span id="issuerName"></span> - <span class="long-date"></span></span></footer>
+	<p class="place"><span class="facture-only">Fait à </span><span contenteditable="plaintext-only" data-key="place" data-ph="Lieu"></span>, le <span class="long-date"></span></p>
+	<footer><span class="site">19h47.fr</span><span class="ref"><span id="kindLabel"></span> - <span id="issuerName"></span> - <span class="long-date"></span></span></footer>
 </article>
 </main>
 
@@ -201,8 +213,13 @@ const RATE = '500';
 const today = () => new Date().toISOString().slice(0, 10);
 const emptyLine = () => ({ label: '', detail: '', qty: '0,125', price: RATE });
 
+const KINDS = { devis: 'Devis', facture: 'Facture' };
+
 const DEFAULT = {
+	kind: 'devis',
+	number: '',
 	issuer: '',
+	vatNumber: '',
 	client: '',
 	title: '',
 	place: '',
@@ -218,6 +235,8 @@ const fmtNum = n => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 4 })
 const fmtEur = n => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(round2(n)) + ' €';
 const fmtDate = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Une facture prend aussi son numéro, comme 2026-10-19-2026019
+const fileName = () => [state.date || today(), state.kind === 'facture' && state.number].filter(Boolean).join('-');
 
 // 1 jour = 8 h, affiché à l'écran seulement
 function fmtHours(qty) {
@@ -277,6 +296,9 @@ function renderTotals() {
 
 function render() {
 	document.querySelectorAll('[data-key]').forEach(el => { el.textContent = state[el.dataset.key] ?? ''; });
+	$('sheet').dataset.kind = state.kind;
+	$('kind').value = state.kind;
+	$('kindLabel').textContent = KINDS[state.kind];
 	$('date').value = state.date;
 	renderLines();
 	renderTotals();
@@ -316,9 +338,16 @@ $('date').addEventListener('input', e => {
 	update();
 });
 
+$('kind').addEventListener('change', e => {
+	state.kind = e.target.value;
+	save();
+	render();
+});
+
 $('new').addEventListener('click', () => {
 	if (!confirm('Vider le devis en cours ? Exporte-le avant si tu veux le garder.')) return;
-	state = { ...state, client: '', title: 'Devis évolution Shopify', date: today(), lines: [emptyLine()] };
+	const title = `${KINDS[state.kind]} évolution Shopify`;
+	state = { ...state, number: '', client: '', title, date: today(), lines: [emptyLine()] };
 	save();
 	render();
 });
@@ -326,7 +355,7 @@ $('new').addEventListener('click', () => {
 $('export').addEventListener('click', () => {
 	const a = document.createElement('a');
 	a.href = URL.createObjectURL(new Blob([JSON.stringify(state, null, '\t')], { type: 'application/json' }));
-	a.download = `${state.date || today()}.json`;
+	a.download = `${fileName()}.json`;
 	a.click();
 	URL.revokeObjectURL(a.href);
 });
@@ -349,7 +378,7 @@ $('importFile').addEventListener('change', async e => {
 
 // Le PDF proposé prend la date pour nom, comme 2026-09-09.pdf
 const appTitle = document.title;
-window.addEventListener('beforeprint', () => { document.title = state.date || today(); });
+window.addEventListener('beforeprint', () => { document.title = fileName(); });
 window.addEventListener('afterprint', () => { document.title = appTitle; });
 $('print').addEventListener('click', () => window.print());
 
