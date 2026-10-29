@@ -1,10 +1,10 @@
 /**
- * App style: the base shared by 19h47's small apps (Tumblr, Messenger, SMS, Tweets, Typewriter, Library).
+ * App style: the base shared by 19h47's small apps (Tumblr, Messenger, SMS, Tweets, Typewriter, Library, Letterhead).
  *
  * Copy this file into an app, with the revision of the gist it comes from in this comment,
  * and add the app's own styles after it. An update is a new copy, app by app.
  *
- * From https://gist.github.com/19h47/27df983fac74beb8d3e0a30688654498, revision 6eea6c0.
+ * From https://gist.github.com/19h47/27df983fac74beb8d3e0a30688654498, revision 031fad8.
  *
  * A golden-ratio scale (φ), colors with light-dark() and color-mix(). Every size is on the scale: its steps for space,
  * half steps (√φ) between them for text; a padding in em follows its text.
