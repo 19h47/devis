@@ -9,35 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="app-style.css">
 <style>
-/* Une feuille A4 éditable en place. La barre d'outils et les boutons disparaissent à l'impression. */
-/* Interface : même système que typewriter, sms, messenger, tumblr et tweets (échelle φ, gris chauds) */
+/* Ce que l'outil ajoute à app-style.css, la base partagée des petites apps : une feuille A4 éditable en place.
+   La barre d'outils, les pastilles et les boutons disparaissent à l'impression. */
 :root {
-	color-scheme: light dark;
-	--devis-phi: 1.618034;
-	--devis-u0: calc(var(--devis-u1) / var(--devis-phi));
-	--devis-u1: 1rem;
-	--devis-u2: calc(var(--devis-phi) * var(--devis-u1));
-	--devis-u3: calc(var(--devis-phi) * var(--devis-u2));
-
-	--devis-bg: light-dark(rgb(255, 255, 255), rgb(26, 26, 26));
-	--devis-text: light-dark(rgb(69, 69, 69), rgb(186, 186, 186));
-	--devis-text-muted: light-dark(rgb(92, 92, 92), rgb(154, 151, 144));
-	--devis-line: light-dark(rgb(201, 196, 184), rgb(58, 56, 52));
-	--devis-line-soft: color-mix(in srgb, var(--devis-line) 50%, transparent);
-
-	--devis-font-mono: "SF Mono", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
-	--devis-font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-	--devis-font-small: var(--devis-u0);
-
-	--devis-radius: var(--devis-u0);
-	--devis-control-size: var(--devis-u3);
-	--devis-control-gap: calc(var(--devis-u0) / var(--devis-phi));
-	--devis-control-opacity: calc(1 / var(--devis-phi));
-	--devis-focus-outline: 2px solid var(--devis-text);
-	--devis-focus-outline-offset: 2px;
-	--devis-transition-1: 0.15s;
-
 	/* La feuille reste du papier blanc, quel que soit le thème */
 	--devis-paper: rgb(255, 255, 255);
 	--devis-ink: rgb(26, 26, 26);
@@ -46,53 +22,23 @@
 	--devis-paper-fill: color-mix(in srgb, var(--devis-paper-line) 20%, transparent);
 	--devis-font-sheet: "Work Sans", "Helvetica Neue", Arial, sans-serif;
 }
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { background: var(--devis-bg); scrollbar-width: none; }
-body {
-	color: var(--devis-text);
-	font-family: var(--devis-font-mono);
-	font-size: var(--devis-u1);
-	line-height: var(--devis-phi);
-	-webkit-font-smoothing: antialiased;
-}
-:focus-visible { outline: var(--devis-focus-outline); outline-offset: var(--devis-focus-outline-offset); }
+/* La feuille commence un pas sous les pastilles et la barre d'outils, qui la recouvrent sinon */
+.devis-page { padding: calc(2 * var(--app-u2) + var(--app-control-size)) var(--app-u2) var(--app-u3); overflow-x: auto; }
 
-.devis-page { padding: calc(var(--devis-u3) + var(--devis-u2)) var(--devis-u2) var(--devis-u3); overflow-x: auto; }
-
-.devis-toolbar { position: fixed; top: var(--devis-u2); right: var(--devis-u2); z-index: 1; display: flex; gap: var(--devis-control-gap); }
-.devis-toolbar button {
-	width: var(--devis-control-size); height: var(--devis-control-size);
-	border: 1px solid var(--devis-line); border-radius: var(--devis-radius);
-	background: var(--devis-bg); color: var(--devis-text); cursor: pointer;
-	font-family: var(--devis-font-ui); font-size: var(--devis-u1);
-	display: flex; align-items: center; justify-content: center;
-	opacity: var(--devis-control-opacity); transition: opacity var(--devis-transition-1);
-}
-.devis-toolbar button:hover, .devis-toolbar button:focus-visible { opacity: 1; }
-
-.devis-pills { position: fixed; top: var(--devis-u2); left: var(--devis-u2); z-index: 1; display: flex; gap: var(--devis-control-gap); }
-.devis-pill {
-	display: inline-flex; align-items: center; gap: var(--devis-u0);
-	height: var(--devis-control-size); padding: 0 calc(var(--devis-u1) / 1.1);
-	border-radius: 999px; border: 1px solid var(--devis-line-soft); background: var(--devis-bg);
-	color: var(--devis-text-muted); font-family: var(--devis-font-ui); font-size: var(--devis-font-small);
-	text-transform: uppercase; white-space: nowrap; cursor: pointer;
-}
-.devis-pill:hover { color: var(--devis-text); }
-.devis-pill:has(:focus-visible) { outline: var(--devis-focus-outline); outline-offset: var(--devis-focus-outline-offset); }
-.devis-pill input, .devis-pill select { border: none; background: transparent; color: var(--devis-text); font: inherit; text-transform: inherit; outline: none; cursor: pointer; }
+/* Les pastilles restent en haut à gauche, face à la barre d'outils, sur un fond qui masque la feuille qui défile */
+.devis-pills { position: fixed; top: var(--app-u2); left: var(--app-u2); z-index: 1; display: flex; gap: var(--app-control-gap); }
+.devis-pills .app-pill { background: var(--app-bg); }
+.app-pill input[type="date"] { border: none; background: transparent; color: inherit; font: inherit; text-transform: inherit; cursor: pointer; }
 
 /* Cotes reprises du gabarit InDesign : Work Sans 12 pt, grille de 14 pt, marges de 98 pt en haut et en bas, 52,64 pt sur les côtés.
    En colonne flexible, le pied de page se cale en bas de la feuille. */
 .sheet {
-	display: flex; flex-direction: column;
+	position: relative; display: flex; flex-direction: column;
 	width: 210mm; min-height: 297mm; margin: 0 auto; padding: 98pt 52.64pt;
 	background: var(--devis-paper); color: var(--devis-ink); color-scheme: light;
 	font-family: var(--devis-font-sheet); font-size: 12pt; line-height: 14pt;
-	border: 1px solid var(--devis-line-soft);
+	border: 1px solid var(--app-line-soft);
 }
 
 [contenteditable] { outline: none; border-radius: 2px; white-space: pre-line; }
@@ -112,20 +58,20 @@ th { font-weight: 500; letter-spacing: .1em; text-transform: uppercase; text-ali
 th:first-child, td:first-child { text-align: left; }
 td { vertical-align: top; text-align: right; padding: 0 0 14pt; position: relative; }
 td .detail { display: block; font-size: 10pt; }
-td .hours { display: block; font-family: var(--devis-font-ui); font-size: 7pt; text-transform: uppercase; color: var(--devis-paper-muted); }
+td .hours { display: block; font-family: var(--app-font-ui); font-size: 7pt; text-transform: uppercase; color: var(--devis-paper-muted); }
 tr { break-inside: avoid; }
 tbody tr .remove {
 	position: absolute; left: -12mm; top: 0; padding: 0 6px; border: 0; background: none; cursor: pointer;
-	color: var(--devis-paper-muted); font-family: var(--devis-font-ui); font-size: 14px; line-height: 14pt;
-	opacity: 0; transition: opacity var(--devis-transition-1);
+	color: var(--devis-paper-muted); font-family: var(--app-font-ui); font-size: 14px; line-height: 14pt;
+	opacity: 0; transition: opacity var(--app-transition-1);
 }
 tbody tr:hover .remove, .remove:focus-visible { opacity: 1; }
 .remove:hover { color: var(--devis-ink); }
 /* Posé dans le blanc à gauche de « Total HT », hors du flux pour ne pas décaler la grille */
 .add {
-	position: absolute; left: 0; top: 14pt; height: 14pt; padding: 0 calc(var(--devis-u1) / 1.1);
-	border-radius: 999px; border: 1px solid var(--devis-paper-line); background: none; cursor: pointer;
-	color: var(--devis-paper-muted); font-family: var(--devis-font-ui); font-size: var(--devis-font-small);
+	position: absolute; left: 0; top: 14pt; height: 14pt; padding: 0 1em;
+	border-radius: calc(infinity * 1px); border: 1px solid var(--devis-paper-line); background: none; cursor: pointer;
+	color: var(--devis-paper-muted); font-family: var(--app-font-ui); font-size: var(--app-font-small);
 	font-weight: 400; letter-spacing: 0; text-transform: uppercase; line-height: 1;
 }
 .add:hover { color: var(--devis-ink); }
@@ -141,7 +87,6 @@ footer { display: flex; justify-content: space-between; align-items: baseline; g
 footer .ref { font-weight: 500; }
 
 /* Grille de contrôle : 12 colonnes de 28 pt, gouttières de 14 pt, lignes de base tous les 14 pt. G pour l'afficher. */
-.sheet { position: relative; }
 devis-grid {
 	position: absolute; inset: 0; z-index: 1; pointer-events: none;
 	background: repeating-linear-gradient(to bottom, transparent 0 calc(14pt - 1px), color-mix(in srgb, var(--devis-paper-line) 70%, transparent) calc(14pt - 1px) 14pt);
@@ -151,14 +96,14 @@ devis-grid span { position: relative; background: color-mix(in srgb, var(--devis
 devis-grid span:nth-child(even) { background: color-mix(in srgb, var(--devis-paper-line) 6%, transparent); }
 devis-grid span::after {
 	content: attr(data-index); position: absolute; inset-inline: 0; bottom: 4pt; text-align: center;
-	font-family: var(--devis-font-ui); font-size: 7pt; color: var(--devis-paper-muted);
+	font-family: var(--app-font-ui); font-size: 7pt; color: var(--devis-paper-muted);
 }
 
 @page { size: A4; margin: 0; }
 @media print {
 	html { background: #fff; }
 	.devis-page { padding: 0; overflow: visible; }
-	.devis-toolbar, .devis-pill, .add, .remove, .hours, devis-grid { display: none !important; }
+	.devis-pills, .add, .remove, .hours, devis-grid { display: none !important; }
 	.sheet { border: 0; margin: 0; }
 	[contenteditable]:empty::before { content: none; }
 }
@@ -166,16 +111,16 @@ devis-grid span::after {
 </head>
 <body>
 <div class="devis-pills">
-	<label class="devis-pill">Document <select id="kind"><option value="devis">Devis</option><option value="facture">Facture</option></select></label>
-	<label class="devis-pill">Date <input type="date" id="date"></label>
+	<label class="app-pill"><span><strong>Document</strong></span><select id="kind"><option value="devis">Devis</option><option value="facture">Facture</option></select></label>
+	<label class="app-pill"><span><strong>Date</strong></span><input type="date" id="date"></label>
 </div>
-<div class="devis-toolbar">
-	<button type="button" id="new" aria-label="Nouveau devis" title="Nouveau devis">+</button>
-	<button type="button" id="import" aria-label="Importer un devis (.json)" title="Importer un devis (.json)">⤒&#xFE0E;</button>
-	<button type="button" id="export" aria-label="Exporter le devis (.json)" title="Exporter le devis (.json)">⤓&#xFE0E;</button>
-	<button type="button" id="grid" aria-label="Afficher la grille (G)" title="Afficher la grille (G)" aria-pressed="false">#</button>
-	<button type="button" id="print" aria-label="Enregistrer en PDF (⌘P)" title="Enregistrer en PDF (⌘P)">⎙&#xFE0E;</button>
-	<button type="button" id="theme" aria-label="Changer de thème" title="Changer de thème"></button>
+<div class="app-toolbar">
+	<button type="button" class="app-control" id="new" aria-label="Nouveau devis" title="Nouveau devis">+</button>
+	<button type="button" class="app-control" id="import" aria-label="Importer un devis (.json)" title="Importer un devis (.json)">⤒&#xFE0E;</button>
+	<button type="button" class="app-control" id="export" aria-label="Exporter le devis (.json)" title="Exporter le devis (.json)">⤓&#xFE0E;</button>
+	<button type="button" class="app-control" id="grid" aria-label="Afficher la grille (G)" title="Afficher la grille (G)" aria-pressed="false">#</button>
+	<button type="button" class="app-control" id="print" aria-label="Enregistrer en PDF (⌘P)" title="Enregistrer en PDF (⌘P)">⎙&#xFE0E;</button>
+	<button type="button" class="app-control" id="theme" aria-label="Changer de thème" title="Changer de thème"></button>
 	<input type="file" id="importFile" accept=".json,application/json" hidden>
 </div>
 
